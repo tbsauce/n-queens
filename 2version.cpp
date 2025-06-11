@@ -20,28 +20,12 @@ public:
 
 private:
   std::array<std::array<bool, MAX_SIZE>, MAX_SIZE> board;
-  std::array<bool, MAX_SIZE> rows;
-  std::array<bool, MAX_SIZE> cols;
-  std::array<bool, 2 * MAX_SIZE - 1> main_diagonal;
-  std::array<bool, 2 * MAX_SIZE - 1> reverse_diagonal;
 };
 
 queens_board::queens_board() {
-  for (size_t i = 0; i < MAX_SIZE; ++i) {
-    for (size_t j = 0; j < MAX_SIZE; ++j) {
+  for (int i = 0; i < MAX_SIZE; ++i)
+    for (int j = 0; j < MAX_SIZE; ++j)
       board[i][j] = false;
-    }
-  }
-
-  for (size_t i = 0; i < MAX_SIZE; ++i) {
-    rows[i] = false;
-    cols[i] = false;
-  }
-
-  for (size_t i = 0; i < 2 * MAX_SIZE - 1; ++i) {
-    main_diagonal[i] = false;
-    reverse_diagonal[i] = false;
-  }
 }
 
 queens_board::~queens_board() {}
@@ -57,10 +41,6 @@ void queens_board::print_board() const {
 
 bool queens_board::set_cell(int row, int col) {
   if(row >= 0 && row < MAX_SIZE && col >= 0 && col < MAX_SIZE && valid_cell(row, col)){
-    rows[row] = true;
-    cols[col] = true;
-    main_diagonal[row - col + (MAX_SIZE - 1)] = true;
-    reverse_diagonal[row + col] = true;
     board[row][col] = true;
     return true;
   }
@@ -69,10 +49,6 @@ bool queens_board::set_cell(int row, int col) {
 
 bool queens_board::remove_cell(int row, int col) {
   if(row >= 0 && row < MAX_SIZE && col >= 0 && col < MAX_SIZE){
-    rows[row] = false;
-    cols[col] = false;
-    main_diagonal[row - col + (MAX_SIZE - 1)] = false;
-    reverse_diagonal[row + col] = false;
     board[row][col] = false;
     return true;
   }
@@ -80,7 +56,19 @@ bool queens_board::remove_cell(int row, int col) {
 }
 
 bool queens_board::valid_cell(int row, int col) const{
-  return !(rows[row] || cols[col] || main_diagonal[row - col + (MAX_SIZE - 1)] || reverse_diagonal[row + col]);
+  for (size_t i = 0; i < MAX_SIZE; i++) {
+    for (size_t j = 0; j < MAX_SIZE; j++) {
+      if(row == i && board[i][j] == true) 
+        return false;
+      if(col == j && board[i][j] == true)
+        return false;
+      if(i - j == row - col && board[i][j] == true)
+        return false;
+      if(i + j == row + col && board[i][j] == true)
+        return false;
+    }
+  }
+  return true;
 }
 
 bool backtracking_queens(queens_board& board, int row){
