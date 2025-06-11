@@ -20,13 +20,9 @@ public:
 private:
   const int size_;
   std::vector<std::vector<bool>> board;
-  std::vector<bool> rows;
-  std::vector<bool> cols;
-  std::vector<bool> main_diagonal;
-  std::vector<bool> reverse_diagonal;
 };
 
-queens_board::queens_board(int size) : size_(size), board(size, std::vector<bool>(size, false)), rows(size, false), cols(size, false), main_diagonal(2 * size - 1, false), reverse_diagonal(2 * size - 1, false) {}
+queens_board::queens_board(int size) : size_(size), board(size, std::vector<bool>(size, false)) {}
 
 queens_board::~queens_board() {}
 
@@ -45,10 +41,6 @@ void queens_board::print_board() const {
 
 bool queens_board::set_cell(int row, int col) {
   if(row >= 0 && row < size_ && col >= 0 && col < size_ && valid_cell(row, col)){
-    rows[row] = true;
-    cols[col] = true;
-    main_diagonal[row - col + (size_ - 1)] = true;
-    reverse_diagonal[row + col] = true;
     board[row][col] = true;
     return true;
   }
@@ -57,10 +49,6 @@ bool queens_board::set_cell(int row, int col) {
 
 bool queens_board::remove_cell(int row, int col) {
   if(row >= 0 && row < size_ && col >= 0 && col < size_){
-    rows[row] = false;
-    cols[col] = false;
-    main_diagonal[row - col + (size_ - 1)] = false;
-    reverse_diagonal[row + col] = false;
     board[row][col] = false;
     return true;
   }
@@ -68,7 +56,19 @@ bool queens_board::remove_cell(int row, int col) {
 }
 
 bool queens_board::valid_cell(int row, int col) const{
-  return !(rows[row] || cols[col] || main_diagonal[row - col + (size_ - 1)] || reverse_diagonal[row + col]);
+  for (size_t i = 0; i < size_; i++) {
+    for (size_t j = 0; j < size_; j++) {
+      if(row == i && board[i][j] == true) 
+        return false;
+      if(col == j && board[i][j] == true)
+        return false;
+      if(i - j == row - col && board[i][j] == true)
+        return false;
+      if(i + j == row + col && board[i][j] == true)
+        return false;
+    }
+  }
+  return true;
 }
 
 bool backtracking_queens(queens_board& board, int row){
