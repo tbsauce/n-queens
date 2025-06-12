@@ -2,7 +2,7 @@
 #include <array>
 #include <cstdlib>
 
-constexpr int MAX_SIZE = 8;
+constexpr int MAX_SIZE = 20;
 
 class queens_board {
 public:
