@@ -1,10 +1,12 @@
 #include <iostream>
-#include <vector>
+#include <array>
 #include <cstdlib>
+
+constexpr int MAX_SIZE = 20;
 
 class queens_board {
 public:
-  queens_board(int size);
+  queens_board();
   queens_board(queens_board &&) = default;
   queens_board(const queens_board &) = default;
   queens_board &operator=(queens_board &&) = default;
@@ -15,24 +17,22 @@ public:
   bool set_cell(int row, int col);
   bool remove_cell(int row, int col);
   bool valid_cell(int row, int col) const;
-  int get_size() const;
 
 private:
-  const int size_;
-  std::vector<std::vector<bool>> board;
+  std::array<std::array<bool, MAX_SIZE>, MAX_SIZE> board;
 };
 
-queens_board::queens_board(int size) : size_(size), board(size, std::vector<bool>(size, false)) {}
+queens_board::queens_board() {
+  for (int i = 0; i < MAX_SIZE; ++i)
+    for (int j = 0; j < MAX_SIZE; ++j)
+      board[i][j] = false;
+}
 
 queens_board::~queens_board() {}
 
-int queens_board::get_size() const{
-  return size_;
-}
-
 void queens_board::print_board() const {
-  for (size_t i = 0; i < size_; i++) {
-    for (size_t j = 0; j < size_; j++) {
+  for (size_t i = 0; i < MAX_SIZE; i++) {
+    for (size_t j = 0; j < MAX_SIZE; j++) {
       std::cout << board[i][j] << ' ';
     }
     std::cout << '\n';
@@ -40,7 +40,7 @@ void queens_board::print_board() const {
 }
 
 bool queens_board::set_cell(int row, int col) {
-  if(row >= 0 && row < size_ && col >= 0 && col < size_ && valid_cell(row, col)){
+  if(row >= 0 && row < MAX_SIZE && col >= 0 && col < MAX_SIZE && valid_cell(row, col)){
     board[row][col] = true;
     return true;
   }
@@ -48,7 +48,7 @@ bool queens_board::set_cell(int row, int col) {
 }
 
 bool queens_board::remove_cell(int row, int col) {
-  if(row >= 0 && row < size_ && col >= 0 && col < size_){
+  if(row >= 0 && row < MAX_SIZE && col >= 0 && col < MAX_SIZE){
     board[row][col] = false;
     return true;
   }
@@ -56,8 +56,8 @@ bool queens_board::remove_cell(int row, int col) {
 }
 
 bool queens_board::valid_cell(int row, int col) const{
-  for (size_t i = 0; i < size_; i++) {
-    for (size_t j = 0; j < size_; j++) {
+  for (size_t i = 0; i < MAX_SIZE; i++) {
+    for (size_t j = 0; j < MAX_SIZE; j++) {
       if(row == i && board[i][j] == true) 
         return false;
       if(col == j && board[i][j] == true)
@@ -73,9 +73,9 @@ bool queens_board::valid_cell(int row, int col) const{
 
 bool backtracking_queens(queens_board& board, int row){
 
-  if(row == board.get_size())
+  if(row == MAX_SIZE)
     return true;
-  for (size_t col = 0; col < board.get_size(); col++) {
+  for (size_t col = 0; col < MAX_SIZE; col++) {
     if(board.set_cell(row, col)){
       if(backtracking_queens(board, row + 1))
         return true;
@@ -85,20 +85,9 @@ bool backtracking_queens(queens_board& board, int row){
   return false;
 }
 
-int main(int argc, char* argv[]) {
+int main() {
 
-  int size = (argc == 2) ? std::atoi(argv[1]) : 8;
-
-  if (size <= 0) {
-    std::cerr << "Please enter a positive integer for board size.\n";
-    return 1;
-  }
-
-  if (argc != 2) {
-    std::cout << "Using default board size: " << size << "\n";
-  }
-
-  queens_board board(size);
+  queens_board board;
   backtracking_queens(board, 0);
   board.print_board();
   return 0;
